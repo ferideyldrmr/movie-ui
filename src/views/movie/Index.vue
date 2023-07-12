@@ -45,7 +45,6 @@
         </div>
       </div>
 
-      <!-- Delete Confirmation Modal -->
       <div
         v-if="selectedMovie && modalType === 'delete'"
         class="modal fade show"
