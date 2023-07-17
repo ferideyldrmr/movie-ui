@@ -2,6 +2,16 @@
   <div class="card w-100">
     <div class="card-title px-3 pt-3 d-flex justify-content-between">
       <h5>Movies</h5>
+      <div class="col-1" style="text-align: right">
+        <select
+          class="form-select form-select-sm ms-2"
+          v-model="sortOrder"
+          @change="sortData"
+        >
+          <option value="asc">A-Z</option>
+          <option value="desc">Z-A</option>
+        </select>
+      </div>
       <button type="button" class="btn btn-success" @click="addNewMovie">
         Add New Movie
       </button>
@@ -45,51 +55,6 @@
         </div>
       </div>
 
-      <div
-        v-if="selectedMovie && modalType === 'delete'"
-        class="modal fade show"
-        tabindex="-1"
-        aria-modal="true"
-        role="dialog"
-        style="display: block"
-      >
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h1 class="modal-title fs-5" id="staticBackdropLabel">
-                {{ selectedMovie.title }}
-              </h1>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-                @click="closeModal"
-              ></button>
-            </div>
-            <div class="modal-body">Are you sure?</div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-bs-dismiss="modal"
-                @click="closeModal"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                class="btn btn-primary"
-                @click="deleteSelectedMovie"
-              >
-                Yes
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Movie Details Modal -->
       <!-- Delete Confirmation Modal -->
       <div
         v-if="selectedMovie && modalType === 'delete'"
@@ -138,7 +103,7 @@
       <!-- Movie Details Modal -->
       <div
         v-if="selectedMovie && modalType === 'view'"
-        class="modal fade show"
+        class="modal fade show modal-lg"
         tabindex="-1"
         aria-modal="true"
         role="dialog"
@@ -161,7 +126,7 @@
             <div class="modal-body">
               <div class="container">
                 <div class="row">
-                  <div class="col">
+                  <div class="col-4">
                     <img
                       :src="selectedMovie.coverImage"
                       class="card-img-top"
@@ -169,9 +134,39 @@
                       style="max-height: 400px; object-fit: contain"
                     />
                   </div>
-                  <div class="col">
+                  <div class="col-8">
                     <h5>{{ selectedMovie.title }}</h5>
                     <p>{{ selectedMovie.desc }}</p>
+                  </div>
+                </div>
+                <h5 class="my-3">Actors</h5>
+                <div class="row">
+                  <div class="col" v-if="selectedMovie.actors.length === 0">
+                    Bu film için bir aktör bulunamadı
+                  </div>
+                  <div
+                    v-else
+                    class="col col-md-4"
+                    v-for="actor in selectedMovie.actors"
+                    :key="actor.id"
+                  >
+                    <div class="card h-100 w-100">
+                      <div class="img-wrapper">
+                        <img
+                          :src="actor.actorImage"
+                          class="card-img-top"
+                          alt="Card image"
+                        />
+                      </div>
+                      <div class="card-body">
+                        <h5
+                          class="card-title text-truncate"
+                          :title="`${actor.name} ${actor.surname}`"
+                        >
+                          {{ actor.name }} {{ actor.surname }}
+                        </h5>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -235,6 +230,7 @@ export default {
       totalPages: 0,
       selectedMovie: null,
       modalType: null,
+      sortOrder:'asc'
     };
   },
   beforeDestroy() {
@@ -249,7 +245,11 @@ export default {
     search(searcKeyword) {
       axios
         .get("https://localhost:7092/api/movies", {
-          params: { page: this.currentPage, pageSize: this.pageSize, searcKeyword },
+          params: {
+            page: this.currentPage,
+            pageSize: this.pageSize,
+            searcKeyword,
+          },
         })
         .then((response) => {
           this.movies = response.data.movies;
@@ -291,7 +291,7 @@ export default {
     fetchMovies() {
       axios
         .get("https://localhost:7092/api/movies", {
-          params: { page: this.currentPage, pageSize: this.pageSize },
+          params: { page: this.currentPage, pageSize: this.pageSize, sortOrder: this.sortOrder },
         })
         .then((response) => {
           this.movies = response.data.movies;
@@ -328,6 +328,10 @@ export default {
         this.fetchMovies();
       }
     },
+   sortData(){
+    this.currentPage=1;
+    this.fetchMovies();
+   }
   },
 };
 </script>

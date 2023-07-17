@@ -39,6 +39,69 @@
               <option v-for="year in years" :key="year">{{ year }}</option>
             </select>
           </div>
+
+          <div class="my-4">
+            <div class="d-flex justify-content-between">
+              <h5>Actors</h5>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-3">
+                <select
+                  class="form-select"
+                  v-model="selectedActor"
+                  aria-label="Default select example"
+                >
+                  <option disabled value="">Please select an actor</option>
+                  <option
+                    v-for="actor in filteredActors"
+                    :key="actor.id"
+                    :value="actor"
+                  >
+                    {{ actor.name }} {{ actor.surname }}
+                  </option>
+                </select>
+              </div>
+              <div class="col-2">
+                <button
+                  type="button"
+                  class="btn btn-info"
+                  @click="addActorToMovie"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-3" v-for="actor in movie.actors" :key="actor.id">
+                <div class="card h-100 w-100">
+                  <div class="img-wrapper">
+                    <img
+                      :src="actor.actorImage"
+                      class="card-img-top"
+                      alt="Card image"
+                      height="400"
+                    />
+                  </div>
+                  <div class="card-body">
+                    <h5 class="card-title text-truncate" :name="actor.name">
+                      {{ actor.name }}
+                    </h5>
+                    <p class="card-text text-truncate">{{ actor.surname }}</p>
+                    <div class="button-wrapper">
+                      <button
+                        type="button"
+                        class="btn btn-danger"
+                        @click="deleteMovieActor(actor)"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
           <button type="submit" class="btn btn-success">Save</button>
         </form>
       </div>
@@ -58,12 +121,33 @@ export default {
         year: null,
         desc: "",
         coverImage: "",
+        actors: [],
       },
+      selectedActor: null,
+      actors: [],
       years: [], // Array to hold the years
     };
   },
-
   methods: {
+    addActorToMovie() {
+      if (this.selectedActor === null) return;
+      this.movie.actors.push(this.selectedActor);
+      this.selectedActor = null;
+    },
+    deleteMovieActor(actor) {
+      const index = this.movie.actors.findIndex((x) => x.id === actor.id);
+      this.movie.actors.splice(index, 1);
+    },
+    async getActors() {
+      await axios
+        .get("https://localhost:7092/api/actors")
+        .then((response) => {
+          this.actors = response.data;
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
     getMovieById() {
       if (this.routerMovieId === 0) return;
 
@@ -90,8 +174,14 @@ export default {
 
     addMovie() {
       const apiUrl = "https://localhost:7092/api/movies";
+
+     const payload = {
+        ...this.movie,
+        actors: this.movie.actors.map((x) => x.id),
+      };
+
       axios
-        .post(apiUrl, this.movie)
+        .post(apiUrl, payload)
         .then(() => {
           this.$router.push({ name: "Movie" });
         })
@@ -102,8 +192,16 @@ export default {
 
     updateMovie() {
       const apiUrl = `https://localhost:7092/api/movies/${this.routerMovieId}`;
+
+      const payload = {
+        ...this.movie,
+        actors: this.movie.actors.map((x) => x.id),
+      };
+
+      console.log(100,payload);
+
       axios
-        .put(apiUrl, this.movie)
+        .put(apiUrl, payload)
         .then(() => {
           this.$router.push({ name: "Movie" });
           // Perform any additional actions upon successful save
@@ -121,6 +219,12 @@ export default {
     },
   },
   computed: {
+    filteredActors() {
+      return this.actors?.filter(
+        (actor) =>
+          !this.movie.actors.some((movieActor) => movieActor.id === actor.id)
+      );
+    },
     routerMovieId() {
       return this.$route.params.id ?? 0;
     },
@@ -128,7 +232,8 @@ export default {
       return this.routerMovieId === 0 ? "Add New Movie" : "Edit Movie";
     },
   },
-  mounted() {
+  async mounted() {
+    await this.getActors();
     this.getMovieById();
     this.getYears(); // Call the getYears method when the component is mounted
   },
