@@ -39,6 +39,23 @@
               <option v-for="year in years" :key="year">{{ year }}</option>
             </select>
           </div>
+          <div class="mb-3">
+            <label for="movieType" class="form-label">Movie Type</label>
+            <select
+              class="form-select"
+              v-model="movie.category.id"
+              aria-label="Default select example"
+            >
+              <option disabled value="">Please select a movie type</option>
+              <option
+                v-for="movieType in movieTypes"
+                :value="movieType.id"
+                :key="movieType"
+              >
+                {{ movieType.name }}
+              </option>
+            </select>
+          </div>
 
           <div class="my-4">
             <div class="d-flex justify-content-between">
@@ -122,10 +139,12 @@ export default {
         desc: "",
         coverImage: "",
         actors: [],
+        movieType: [],
       },
       selectedActor: null,
       actors: [],
       years: [], // Array to hold the years
+      movieTypes: [],
     };
   },
   methods: {
@@ -151,16 +170,19 @@ export default {
     getMovieById() {
       if (this.routerMovieId === 0) return;
 
-      const apiUrl = `https://localhost:7092/api/movies/${this.routerMovieId}`; // Replace with your API endpoint URL
+      const apiUrl = `https://localhost:7092/api/movies/${this.routerMovieId}`;
+
       axios
         .get(apiUrl)
         .then((response) => {
           this.movie = response.data;
+          this.selectedMovieType = this.movie.categoryId; // Film türünü seçili olarak ayarla
         })
         .catch((error) => {
           console.error("Failed to save film:", error);
         });
     },
+
     submitForm(event) {
       event.preventDefault();
 
@@ -175,9 +197,10 @@ export default {
     addMovie() {
       const apiUrl = "https://localhost:7092/api/movies";
 
-     const payload = {
+      const payload = {
         ...this.movie,
         actors: this.movie.actors.map((x) => x.id),
+           categoryId : this.movie.category.id
       };
 
       axios
@@ -192,13 +215,13 @@ export default {
 
     updateMovie() {
       const apiUrl = `https://localhost:7092/api/movies/${this.routerMovieId}`;
-
       const payload = {
         ...this.movie,
         actors: this.movie.actors.map((x) => x.id),
+        categoryId : this.movie.category.id
       };
 
-      console.log(100,payload);
+      console.log(100, payload);
 
       axios
         .put(apiUrl, payload)
@@ -217,6 +240,16 @@ export default {
         this.years.push(year);
       }
     },
+    async getMovieType() {
+      await axios
+        .get("https://localhost:7092/api/categories")
+        .then((response) => {
+          this.movieTypes = response.data;
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
   },
   computed: {
     filteredActors() {
@@ -234,6 +267,7 @@ export default {
   },
   async mounted() {
     await this.getActors();
+    await this.getMovieType();
     this.getMovieById();
     this.getYears(); // Call the getYears method when the component is mounted
   },

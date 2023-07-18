@@ -12,6 +12,23 @@
           <option value="desc">Z-A</option>
         </select>
       </div>
+      <div class="col-1" style="text-align: right">
+        <select
+          class="form-select form-select-sm ms-2"
+          v-model="categoryType"
+          @change="sortData"
+        >
+          <option value="-1">Tümü</option>
+          <option
+            v-for="movieType in movieTypes"
+            :value="movieType.id"
+            :key="`mt-${movieType.id}`"
+          >
+            {{ movieType.name }}
+          </option>
+        </select>
+      </div>
+
       <button type="button" class="btn btn-success" @click="addNewMovie">
         Add New Movie
       </button>
@@ -52,6 +69,10 @@
               </div>
             </div>
           </div>
+        </div>
+        <!-- If the movie type is not found, show this message -->
+        <div v-if="movies.length === 0">
+          <p>Aradığınız türde film bulunamamıştır.</p>
         </div>
       </div>
 
@@ -230,7 +251,9 @@ export default {
       totalPages: 0,
       selectedMovie: null,
       modalType: null,
-      sortOrder:'asc'
+      sortOrder: "asc",
+      categoryType: -1,
+      movieTypes: [],
     };
   },
   beforeDestroy() {
@@ -239,6 +262,7 @@ export default {
   mounted() {
     this.$root.$on("search", this.search);
     this.fetchMovies();
+    this.getMovieType();
   },
   computed: {},
   methods: {
@@ -291,7 +315,12 @@ export default {
     fetchMovies() {
       axios
         .get("https://localhost:7092/api/movies", {
-          params: { page: this.currentPage, pageSize: this.pageSize, sortOrder: this.sortOrder },
+          params: {
+            page: this.currentPage,
+            pageSize: this.pageSize,
+            sortOrder: this.sortOrder,
+            categoryType: this.categoryType,
+          },
         })
         .then((response) => {
           this.movies = response.data.movies;
@@ -328,10 +357,21 @@ export default {
         this.fetchMovies();
       }
     },
-   sortData(){
-    this.currentPage=1;
-    this.fetchMovies();
-   }
+    sortData() {
+      this.currentPage = 1;
+      this.fetchMovies();
+    },
+
+    async getMovieType() {
+      await axios
+        .get("https://localhost:7092/api/categories")
+        .then((response) => {
+          this.movieTypes = response.data;
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
   },
 };
 </script>
