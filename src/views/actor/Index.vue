@@ -2,9 +2,31 @@
   <div class="card w-100">
     <div class="card-title px-3 pt-3 d-flex justify-content-between">
       <h5>Actors</h5>
-      <button type="button" class="btn btn-success" @click="addNewActor">
-        Add New Actor
-      </button>
+      <div class="d-flex flex-row">
+        <div class="d-flex flex-row">
+          <select
+            class="form-control form-control-sm mr-2"
+            v-model="sortOrder"
+            @change="sortData"
+          >
+            <option value="asc">A-Z</option>
+            <option value="desc">Z-A</option>
+          </select>
+        </div>
+
+        <div class="d-flex flex-row">
+          <button
+            type="button"
+            class="btn btn-warning mr-2"
+            @click="exportActors"
+          >
+            Export Actors to CSV
+          </button>
+          <button type="button" class="btn btn-success" @click="addNewActor">
+            Add New Actor
+          </button>
+        </div>
+      </div>
     </div>
     <div class="card-body">
       <div class="row">
@@ -189,6 +211,7 @@ export default {
       totalPages: 0,
       selectedActor: null,
       modalType: null,
+      sortOrder: "asc",
     };
   },
   beforeDestroy() {
@@ -249,7 +272,11 @@ export default {
     fetchActors() {
       axios
         .get("https://localhost:7092/api/actors", {
-          params: { page: this.currentPage, pageSize: this.pageSize },
+          params: {
+            page: this.currentPage,
+            pageSize: this.pageSize,
+            sortOrder: this.sortOrder,
+          },
         })
         .then((response) => {
           this.actors = response.data.actors;
@@ -285,6 +312,18 @@ export default {
         this.currentPage++;
         this.fetchActors();
       }
+    },
+    sortData() {
+      this.currentPage = 1;
+      this.fetchActors();
+    },
+    exportActors() {
+      const link = document.createElement("a");
+      link.href = "https://localhost:7092/api/actors/export";
+      link.download = "actors.csv";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     },
   },
 };
@@ -326,5 +365,9 @@ export default {
 .delete-button {
   background-color: red;
   color: white;
+}
+
+.mr-2 {
+  margin-right: 10px;
 }
 </style>

@@ -2,36 +2,41 @@
   <div class="card w-100">
     <div class="card-title px-3 pt-3 d-flex justify-content-between">
       <h5>Movies</h5>
-      <div class="col-1" style="text-align: right">
-        <select
-          class="form-select form-select-sm ms-2"
-          v-model="sortOrder"
-          @change="sortData"
-        >
-          <option value="asc">A-Z</option>
-          <option value="desc">Z-A</option>
-        </select>
-      </div>
-      <div class="col-1" style="text-align: right">
-        <select
-          class="form-select form-select-sm ms-2"
-          v-model="categoryType"
-          @change="sortData"
-        >
-          <option value="-1">Tümü</option>
-          <option
-            v-for="movieType in movieTypes"
-            :value="movieType.id"
-            :key="`mt-${movieType.id}`"
-          >
-            {{ movieType.name }}
-          </option>
-        </select>
-      </div>
 
-      <button type="button" class="btn btn-success"  @click="addNewMovie">
-        Add New Movie
-      </button>
+      <div class="d-flex flex-row">
+        <div class="d-flex flex-row">
+          <select
+            class="form-control form-control-sm mr-2"
+            v-model="sortOrder"
+            @change="sortData"
+          >
+            <option value="asc">A-Z</option>
+            <option value="desc">Z-A</option>
+          </select>
+          <select
+            class="form-control form-control-sm mr-2"
+            v-model="categoryType"
+            @change="sortData"
+          >
+            <option value="-1">Tümü</option>
+            <option
+              v-for="movieType in movieTypes"
+              :value="movieType.id"
+              :key="`mt-${movieType.id}`"
+            >
+              {{ movieType.name }}
+            </option>
+          </select>
+        </div>
+        <div class="d-flex flex-row">
+          <button type="button" class="btn btn-warning mr-2" @click="exportMovies">
+            Export Movies to CSV
+          </button>
+          <button type="button" class="btn btn-success" @click="addNewMovie">
+            Add New Movie
+          </button>
+        </div>
+      </div>
     </div>
     <div class="card-body">
       <div class="row">
@@ -159,10 +164,13 @@
                     <h5>{{ selectedMovie.title }}</h5>
                     <p>{{ selectedMovie.desc }}</p>
                     <ul type="square">
-                      <li><p> Year: {{ selectedMovie.year }}</p></li>
-                      <li><p> Movie Type: {{ selectedMovie.category.name }}</p></li>
+                      <li>
+                        <p>Year: {{ selectedMovie.year }}</p>
+                      </li>
+                      <li>
+                        <p>Movie Type: {{ selectedMovie.category.name }}</p>
+                      </li>
                     </ul>
-                    
                   </div>
                 </div>
                 <h5 class="my-3">Actors</h5>
@@ -290,8 +298,6 @@ export default {
         });
     },
     addNewMovie() {
-
-
       this.$router.push({ name: "Edit" });
     },
     openDeleteModal(movie) {
@@ -378,6 +384,14 @@ export default {
           console.error(error);
         });
     },
+    exportMovies() {
+      const link = document.createElement("a");
+      link.href = "https://localhost:7092/api/movies/export";
+      link.download = "movies.csv";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    },
   },
 };
 </script>
@@ -418,5 +432,15 @@ export default {
 .delete-button {
   background-color: red;
   color: white;
+}
+
+.button-container button {
+  margin-bottom: 10px;
+  margin-right: 10px;
+  color: white;
+}
+
+.mr-2{
+  margin-right: 10px;
 }
 </style>
