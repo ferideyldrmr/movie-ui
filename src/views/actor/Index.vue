@@ -23,9 +23,9 @@
             </div>
             <div class="card-body">
               <h5 class="card-title text-truncate" :name="actor.name">
-                {{ actor.name }}
+                {{ actor.name }} {{ actor.surname }}
               </h5>
-              <p class="card-text text-truncate">{{ actor.surname }}</p>
+              <!-- <p class="card-text text-truncate">{{ actor.surname }}</p> -->
               <div class="button-wrapper">
                 <router-link
                   :to="{ name: 'EditActor', params: { id: actor.id } }"
@@ -44,7 +44,6 @@
           </div>
         </div>
       </div>
-
       <!-- Delete Confirmation Modal -->
       <div
         v-if="selectedActor && modalType === 'delete'"
@@ -58,7 +57,7 @@
           <div class="modal-content">
             <div class="modal-header">
               <h1 class="modal-title fs-5" id="staticBackdropLabel">
-                {{ selectedActor.name }}
+                {{ selectedActor.name }} {{ selectedActor.surname }}
               </h1>
               <button
                 type="button"
@@ -68,53 +67,7 @@
                 @click="closeModal"
               ></button>
             </div>
-            <div class="modal-body">Are you sure?</div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-bs-dismiss="modal"
-                @click="closeModal"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                class="btn btn-primary"
-                @click="deleteSelectedActor"
-              >
-                Yes
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Movie Details Modal -->
-      <!-- Delete Confirmation Modal -->
-      <div
-        v-if="selectedActor && modalType === 'delete'"
-        class="modal fade show"
-        tabindex="-1"
-        aria-modal="true"
-        role="dialog"
-        style="display: block"
-      >
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h1 class="modal-title fs-5" id="staticBackdropLabel">
-                {{ selectedActor.name }}
-              </h1>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-                @click="closeModal"
-              ></button>
-            </div>
-            <div class="modal-body">Are you sure?</div>
+            <div class="modal-body">Do you want to delete this actor?</div>
             <div class="modal-footer">
               <button
                 type="button"
@@ -149,7 +102,7 @@
           <div class="modal-content">
             <div class="modal-header">
               <h1 class="modal-title fs-5" id="ActorModalLabel">
-                {{ selectedActor.name }}
+                {{ selectedActor.name }} {{ selectedActor.surname }}
               </h1>
               <button
                 type="button"
@@ -170,10 +123,10 @@
                       style="max-height: 400px; object-fit: contain"
                     />
                   </div>
-                  <div class="col">
-                    <h5>{{ selectedActor.name }}</h5>
+                  <!-- <div class="col">
+                    <h5>{{ selectedActor.name }}{{ selectedActor.surname }}</h5>
                     <p>{{ selectedActor.surname }}</p>
-                  </div>
+                  </div> -->
                 </div>
               </div>
 
@@ -250,7 +203,11 @@ export default {
     search(searcKeyword) {
       axios
         .get("https://localhost:7092/api/actors", {
-          params: { page: this.currentPage, pageSize: this.pageSize, searcKeyword },
+          params: {
+            page: this.currentPage,
+            pageSize: this.pageSize,
+            searcKeyword,
+          },
         })
         .then((response) => {
           this.actors = response.data.actors;

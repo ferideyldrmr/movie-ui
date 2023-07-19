@@ -36,7 +36,7 @@
               aria-label="Default select example"
             >
               <option disabled value="">Please select a year</option>
-              <option v-for="year in years" :key="year">{{ year }}</option>
+              <option v-for="year in years" :key="`year-${year}`">{{ year }}</option>
             </select>
           </div>
           <div class="mb-3">
@@ -50,7 +50,7 @@
               <option
                 v-for="movieType in movieTypes"
                 :value="movieType.id"
-                :key="movieType"
+                :key="`mty-${movieType.id}`"
               >
                 {{ movieType.name }}
               </option>
@@ -72,7 +72,7 @@
                   <option disabled value="">Please select an actor</option>
                   <option
                     v-for="actor in filteredActors"
-                    :key="actor.id"
+                    :key="`actor-opt-${actor.id}`"
                     :value="actor"
                   >
                     {{ actor.name }} {{ actor.surname }}
@@ -90,7 +90,7 @@
               </div>
             </div>
             <div class="row">
-              <div class="col-3" v-for="actor in movie.actors" :key="actor.id">
+              <div class="col-3" v-for="actor in movie.actors" :key="`actor-${actor.id}`">
                 <div class="card h-100 w-100">
                   <div class="img-wrapper">
                     <img
@@ -137,6 +137,8 @@ export default {
         title: "",
         year: null,
         desc: "",
+       category:{  id:-1,
+       },
         coverImage: "",
         actors: [],
         movieType: [],
@@ -259,6 +261,7 @@ export default {
       );
     },
     routerMovieId() {
+      console.log(this.$route.params)
       return this.$route.params.id ?? 0;
     },
     pageTitle() {

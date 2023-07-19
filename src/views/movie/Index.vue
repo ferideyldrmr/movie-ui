@@ -29,7 +29,7 @@
         </select>
       </div>
 
-      <button type="button" class="btn btn-success" @click="addNewMovie">
+      <button type="button" class="btn btn-success"  @click="addNewMovie">
         Add New Movie
       </button>
     </div>
@@ -70,7 +70,7 @@
             </div>
           </div>
         </div>
-        <!-- If the movie type is not found, show this message -->
+        <!-- If the movie type is not found -->
         <div v-if="movies.length === 0">
           <p>Aradığınız türde film bulunamamıştır.</p>
         </div>
@@ -158,6 +158,11 @@
                   <div class="col-8">
                     <h5>{{ selectedMovie.title }}</h5>
                     <p>{{ selectedMovie.desc }}</p>
+                    <ul type="square">
+                      <li><p> Year: {{ selectedMovie.year }}</p></li>
+                      <li><p> Movie Type: {{ selectedMovie.category.name }}</p></li>
+                    </ul>
+                    
                   </div>
                 </div>
                 <h5 class="my-3">Actors</h5>
@@ -285,7 +290,8 @@ export default {
         });
     },
     addNewMovie() {
-      console.log("xx");
+
+
       this.$router.push({ name: "Edit" });
     },
     openDeleteModal(movie) {
