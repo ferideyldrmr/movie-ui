@@ -2,7 +2,9 @@
   <div>
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
       <div class="container-fluid">
-        <a class="navbar-brand" href="#">Navbar</a>
+        <router-link class="navbar-brand" :to="{ name: 'Movie' }">
+          <i class="fas fa-video"></i>
+        </router-link>
         <button
           class="navbar-toggler"
           type="button"
@@ -19,6 +21,11 @@
             <li class="nav-item">
               <router-link class="nav-link" :to="{ name: 'Movie' }">
                 Movies</router-link
+              >
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link" :to="{ name: 'Show' }">
+                TV Shows</router-link
               >
             </li>
             <li class="nav-item">
