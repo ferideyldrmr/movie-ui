@@ -151,8 +151,67 @@
                   </div> -->
                 </div>
               </div>
-
-              <!-- Eklediğiniz diğer bilgileri buraya ekleyebilirsiniz -->
+              <h5 class="my-3">Movies and Shows</h5>
+              <div class="row">
+                <div
+                  class="col"
+                  v-if="
+                    !selectedActor.movies.length && !selectedActor.shows.length
+                  "
+                >
+                  Bu aktörün oynadığı film veya şov bulunamadı
+                </div>
+                <div
+                  v-else
+                  class="col col-md-4"
+                  v-for="movie in selectedActor.movies"
+                  :key="movie.id"
+                >
+                  <div class="card h-100 w-100">
+                    <div class="img-wrapper">
+                      <img
+                        :src="movie.coverImage"
+                        class="card-img-top"
+                        alt="Card image"
+                      />
+                    </div>
+                    <div class="card-body">
+                      <h5
+                        class="card-title text-truncate"
+                        :title="`${movie.title}`"
+                      >
+                        {{ movie.title }}
+                      </h5>
+                    </div>
+                  </div>
+                </div>
+                <!-- <div class="col" v-if="!selectedActor.shows.length ">
+                  Bu aktörün oynadığı bir şov bulunamadı
+                </div> -->
+                <div
+                  class="col col-md-4"
+                  v-for="show in selectedActor.shows"
+                  :key="show.id"
+                >
+                  <div class="card h-100 w-100">
+                    <div class="img-wrapper">
+                      <img
+                        :src="show.coverImage"
+                        class="card-img-top"
+                        alt="Card image"
+                      />
+                    </div>
+                    <div class="card-body">
+                      <h5
+                        class="card-title text-truncate"
+                        :title="`${show.title}`"
+                      >
+                        {{ show.title }}
+                      </h5>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
             <div class="modal-footer">
               <button

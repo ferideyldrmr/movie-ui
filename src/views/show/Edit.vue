@@ -36,7 +36,9 @@
               aria-label="Default select example"
             >
               <option disabled value="">Please select a year</option>
-              <option v-for="year in years" :key="`year-${year}`">{{ year }}</option>
+              <option v-for="year in years" :key="`year-${year}`">
+                {{ year }}
+              </option>
             </select>
           </div>
           <div class="mb-3">
@@ -90,7 +92,11 @@
               </div>
             </div>
             <div class="row">
-              <div class="col-3" v-for="actor in show.actors" :key="`actor-${actor.id}`">
+              <div
+                class="col-3"
+                v-for="actor in show.actors"
+                :key="`actor-${actor.id}`"
+              >
                 <div class="card h-100 w-100">
                   <div class="img-wrapper">
                     <img
@@ -119,6 +125,22 @@
               </div>
             </div>
           </div>
+          <div class="mb-3">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="isShowOver"
+                v-model="show.expire"
+                :true-value="true" 
+                :false-value="false"
+              />
+              <label class="form-check-label" for="isShowOver">
+                This show is over
+              </label>
+            </div>
+          </div>
+
           <button type="submit" class="btn btn-success">Save</button>
         </form>
       </div>
@@ -137,11 +159,11 @@ export default {
         title: "",
         year: null,
         desc: "",
-       category:{  id:-1,
-       },
+        category: { id: -1 },
         coverImage: "",
         actors: [],
         showType: [],
+        expire: true,
       },
       selectedActor: null,
       actors: [],
@@ -178,10 +200,23 @@ export default {
         .get(apiUrl)
         .then((response) => {
           this.show = response.data;
+          this.selectedIsShowOver = this.show.expire;
           this.selectedShowType = this.show.categoryId; // Film türünü seçili olarak ayarla
         })
         .catch((error) => {
           console.error("Failed to save film:", error);
+        });
+    },
+    async getIsShowOver() {
+      await axios
+        .get("https://localhost:7092/api/shows")
+        .then((response) => {
+          this.show.expire = response.data.isShowOver;
+        })
+
+        .catch((error) => {
+          console.error("Film durumu güncellenemedi:", error);
+          // Hata durumunda kullanıcıya uygun bir hata mesajı gösterebilirsiniz
         });
     },
 
@@ -202,7 +237,8 @@ export default {
       const payload = {
         ...this.show,
         actors: this.show.actors.map((x) => x.id),
-           categoryId : this.show.category.id
+        categoryId: this.show.category.id,
+        expire: this.show.expire,
       };
 
       axios
@@ -214,13 +250,30 @@ export default {
           console.error("Film kaydedilemedi:", error);
         });
     },
+    toggleIsShowOver() {
+      this.show.expire = !this.show.expire;
+      const apiUrl = `https://localhost:7092/api/shows/${this.routerShowId}`;
+      const payload = {
+        expire: this.show.expire,
+      };
+      axios
+        .put(apiUrl, payload)
+        .then(() => {
+          console.log("Film durumu güncellendi");
+        })
+        .catch((error) => {
+          console.error("Film durumu güncellenemedi:", error);
+          // Hata durumunda kullanıcıya uygun bir hata mesajı gösterebilirsiniz
+        });
+    },
 
     updateShow() {
       const apiUrl = `https://localhost:7092/api/shows/${this.routerShowId}`;
       const payload = {
         ...this.show,
         actors: this.show.actors.map((x) => x.id),
-        categoryId : this.show.category.id
+        categoryId: this.show.category.id,
+        expire: this.show.expire,
       };
 
       console.log(100, payload);
@@ -261,7 +314,7 @@ export default {
       );
     },
     routerShowId() {
-      console.log(this.$route.params)
+      console.log(this.$route.params);
       return this.$route.params.id ?? 0;
     },
     pageTitle() {
@@ -271,7 +324,7 @@ export default {
   async mounted() {
     await this.getActors();
     await this.getShowType();
-    this.getShowById();
+    this.getIsShowOver(), this.getShowById();
     this.getYears(); // Call the getYears method when the component is mounted
   },
 };

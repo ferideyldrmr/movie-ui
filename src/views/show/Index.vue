@@ -29,7 +29,11 @@
           </select>
         </div>
         <div class="d-flex flex-row">
-          <button type="button" class="btn btn-warning mr-2" @click="exportShows">
+          <button
+            type="button"
+            class="btn btn-warning mr-2"
+            @click="exportShows"
+          >
             Export TV Show to CSV
           </button>
           <button type="button" class="btn btn-success" @click="addNewShow">
@@ -219,6 +223,19 @@
           </div>
         </div>
       </div>
+      <div class="form-check">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          value=""
+          id="flexCheckDefault"
+          v-model="finishedFilter"
+          @change="toggleIsShowOverFilter"
+        />
+        <label class="form-check-label" for="flexCheckDefault">
+          Ending shows
+        </label>
+      </div>
     </div>
     <div class="card-footer">
       <nav
@@ -267,6 +284,7 @@ export default {
       sortOrder: "asc",
       categoryType: -1,
       showTypes: [],
+      finishedFilter: false,
     };
   },
   beforeDestroy() {
@@ -311,9 +329,7 @@ export default {
         .delete(`https://localhost:7092/api/shows/${this.selectedShow.id}`)
         .then(() => {
           // Update the movies list after deletion
-          this.shows = this.shows.filter(
-            (x) => x.id !== this.selectedShow.id
-          );
+          this.shows = this.shows.filter((x) => x.id !== this.selectedShow.id);
 
           this.closeModal();
         })
@@ -332,6 +348,7 @@ export default {
             pageSize: this.pageSize,
             sortOrder: this.sortOrder,
             categoryType: this.categoryType,
+            finishedFilter: this.finishedFilter,
           },
         })
         .then((response) => {
@@ -342,6 +359,10 @@ export default {
         .catch((error) => {
           console.error(error);
         });
+    },
+    toggleIsShowOverFilter() {
+      this.isShowOverFilter = !this.isShowOverFilter;
+      this.fetchShows(); // Yeniden verileri çekmek için
     },
     openImageModal(show) {
       console.log(show);
@@ -440,7 +461,7 @@ export default {
   color: white;
 }
 
-.mr-2{
+.mr-2 {
   margin-right: 10px;
 }
 </style>

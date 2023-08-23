@@ -2,7 +2,7 @@
   <div>
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
       <div class="container-fluid">
-        <router-link class="navbar-brand" :to="{ name: 'Movie' }">
+        <router-link class="navbar-brand" :to="{ name: 'Home' }">
           <i class="fas fa-video"></i>
         </router-link>
         <button

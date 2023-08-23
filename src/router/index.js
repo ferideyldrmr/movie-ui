@@ -10,13 +10,22 @@ import ShowEdit from "@/views/show/Edit.vue";
 import ActorEdit from "@/views/actor/Edit.vue";
 import ActorView from "@/views/actor/Index.vue";
 import '@fortawesome/fontawesome-free/css/all.css';
+import CardView from '@/views/card/Index.vue';
 
 
 Vue.use(VueRouter);
 
 const routes = [
   {
-    path: "/:pageNumber?",
+    path: '/',
+    name: 'Home',
+    component: CardView,
+    props: {
+      cardTitle: 'Ana Sayfa'
+    }
+  },
+  {
+    path: "/movies/:pageNumber?",
     name: "Movie",
     component: MovieView,
   },
